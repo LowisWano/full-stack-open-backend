@@ -1,9 +1,12 @@
-const express = require('express')
-const app = express()
-const morgan = require('morgan')
+const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
 
-app.use(express.json())
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+const app = express();
+
+app.use(express.json());
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+app.use(cors());
 
 let persons = [
     { 
@@ -58,6 +61,8 @@ const generateID = () => {
     return String(Math.floor(Math.random() * 10000000)) 
 }
 
+morgan.token('body', request => JSON.stringify(request.body));
+
 app.post('/api/persons', (request, response) => {
   const body = request.body;
 
@@ -81,7 +86,6 @@ app.post('/api/persons', (request, response) => {
 
   persons = persons.concat(person);
   response.json(person);
-  morgan.token('body', request => JSON.stringify(request.body))
 })
 
 const PORT = 3001
