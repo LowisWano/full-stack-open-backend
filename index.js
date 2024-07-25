@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -7,29 +8,8 @@ app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 app.use(cors());
 app.use(express.static('dist'))
-require('dotenv').config()
 
-
-const mongoose = require('mongoose');
-mongoose.set('strictQuery',false);
-
-// connect to MongoDB
-async function connectDatabase(){
-  try{
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Succesfully connected to MongoDB');
-  } catch(error){
-    console.log('Error connected to MongoDB:', error);
-  }
-}
-connectDatabase();
-
-// schema and Model definition
-const personSchema = new mongoose.Schema({
-  "name": String,
-  "number": String
-})
-const Person = mongoose.model('Person', personSchema);
+const Person = require('./models/person')
 
 // routes
 app.get('/info', (request, response)=>{
@@ -75,20 +55,21 @@ app.post('/api/persons', (request, response) => {
       })
   }
 
-  if(persons.find((person) => person.name === body.name)){
-      return response.status(409).json({
-          error: 'name must be unique'
-      })
-  }
+  // if(persons.find((person) => person.name === body.name)){
+  //     return response.status(409).json({
+  //         error: 'name must be unique'
+  //     })
+  // }
 
-  const person = {
+  const person = new Person({
       id: generateID(),
       name: body.name,
       number: body.number
-  }
+  })
 
-  persons = persons.concat(person);
-  response.json(person);
+  person.save().then(savedEntry=>{
+    response.json(savedEntry)
+  })
 })
 
 // server initialization
