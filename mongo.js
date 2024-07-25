@@ -1,21 +1,16 @@
 const mongoose = require('mongoose');
+mongoose.set('strictQuery',false);
 
 if (process.argv.length<3) {
   console.log('give password as argument');
   process.exit(1);
 }
-
-const password = process.argv[2];
+const [, , password, new_name, new_number] = process.argv;
 
 const url =
-  `mongodb+srv://luisandreiouano:${password}@cluster0.whuzxsu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
-mongoose.set('strictQuery',false);
+  `mongodb+srv://luisandreiouano:${password}@cluster0.whuzxsu.mongodb.net/personApp?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose.connect(url);
-
-const name = process.argv[3];
-const number = process.argv[4];
 
 const personSchema = new mongoose.Schema({
   "name": String,
@@ -24,3 +19,28 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema);
 
+if(!new_name && !new_number){
+  Person.find({})
+  .then(result=>{
+    console.log('phonebook:');
+    result.forEach(person=>{
+      console.log(`${person.name} ${person.number}`);
+    })
+    processEnd();
+  })
+}else{
+  const person = new Person({
+    name: new_name,
+    number: new_number,
+  })
+  
+  person.save().then(result=>{
+    console.log('note saved!');
+    processEnd();
+  })
+}
+
+function processEnd(){
+  mongoose.connection.close();
+  process.exit();
+}
