@@ -1,37 +1,37 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-
 const app = express();
 
 app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 app.use(cors());
 app.use(express.static('dist'))
+require('dotenv').config()
 
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 
+const mongoose = require('mongoose');
+mongoose.set('strictQuery',false);
+
+// connect to MongoDB
+async function connectDatabase(){
+  try{
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Succesfully connected to MongoDB');
+  } catch(error){
+    console.log('Error connected to MongoDB:', error);
+  }
+}
+connectDatabase();
+
+// schema and Model definition
+const personSchema = new mongoose.Schema({
+  "name": String,
+  "number": String
+})
+const Person = mongoose.model('Person', personSchema);
+
+// routes
 app.get('/info', (request, response)=>{
     const date = new Date();
     response.send(`
@@ -41,7 +41,9 @@ app.get('/info', (request, response)=>{
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons);
+    Person.find({}).then(persons=>{
+      response.json(persons);
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -89,6 +91,7 @@ app.post('/api/persons', (request, response) => {
   response.json(person);
 })
 
+// server initialization
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
