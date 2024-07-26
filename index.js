@@ -14,23 +14,25 @@ const Person = require('./models/person')
 // routes
 app.get('/info', (request, response)=>{
     const date = new Date();
-    response.send(`
+    Person.find({}).then(persons=>{
+      response.send(`
         <p>Phonebook has info for ${persons.length} people</p> 
         <p>${date}</p>
     `);
+    })
 })
 
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons=>{
+      console.log(persons);
       response.json(persons);
     })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id;
-    const person = persons.find(person => person.id === id);
-
-    person ? response.json(person): response.status(404).end();    
+    Person.findById(request.params.id).then(person=>{
+        response.json(person);
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
