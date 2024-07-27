@@ -1,30 +1,30 @@
 
-const mongoose = require('mongoose');
-mongoose.set('strictQuery',false);
+const mongoose = require('mongoose')
+mongoose.set('strictQuery',false)
 
 // connect to MongoDB
 async function connectDatabase(){
   try{
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Succesfully connected to MongoDB');
+    await mongoose.connect(process.env.MONGODB_URI)
+    console.log('Succesfully connected to MongoDB')
   } catch(error){
-    console.log('Error connected to MongoDB:', error);
+    console.log('Error connected to MongoDB:', error)
   }
 }
-connectDatabase();
+connectDatabase()
 
 // schema and Model definition
 const personSchema = new mongoose.Schema({
-  "name": {
+  'name': {
     type: String,
     minLength: 3,
     required: true
   },
-  "number":{
+  'number':{
     type: String,
     required: true,
     validate: {
-      validator: function(n) { return /\d{2,3}-\d{6,}/.test(n);},
+      validator: function(n) { return /\d{2,3}-\d{6,}/.test(n)},
       message: props => `${props.value} is not a valid phone number!`
     }
   }
@@ -38,4 +38,4 @@ personSchema.set('toJSON', {
   }
 })
 
-module.exports = mongoose.model('Person', personSchema);
+module.exports = mongoose.model('Person', personSchema)
