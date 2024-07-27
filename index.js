@@ -83,9 +83,6 @@ app.put('/api/persons/:id', (request, response, next)=>{
   }
   Person.findByIdAndUpdate(request.params.id, person, { new:true, runValidators:true, context:'query' })
   .then(updatedNote=>{
-    if(!updatedNote){
-      response.status(404).json({ message: `Information of ${request.body.name} has already been removed from server` })
-    }
     response.json(updatedNote)
   })
   .catch(error=>next(error))
