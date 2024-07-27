@@ -1,18 +1,21 @@
 require('dotenv').config()
+
+// Dependencies
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const app = express();
 
-app.use(express.json());
-
-// configure this later how to really do it
+// Token
 morgan.token('body', request => JSON.stringify(request.body));
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
+// Middlewares
+app.use(express.json());
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 app.use(cors());
 app.use(express.static('dist'))
 
+// Import Model
 const Person = require('./models/person')
 
 // route handlers
@@ -98,7 +101,7 @@ app.use((error, request, response, next) => {
   next(error)
 });
 
-// server initialization
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
