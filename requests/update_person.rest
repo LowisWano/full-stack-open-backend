@@ -1,7 +1,7 @@
-PUT http://localhost:3001/api/persons/66a313de04592778b850daf7
+PUT http://localhost:3001/api/persons/66a1d22bd289bd83c86446f6
 Content-Type: application/json
 
 {
-  "name":"Test Mimic",
+  "name":"Tenn",
   "number": "343243242"
 }
